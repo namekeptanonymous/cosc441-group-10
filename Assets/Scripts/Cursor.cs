@@ -12,7 +12,7 @@ public class Cursor : MonoBehaviour
     }
 
     // Serialize the enum field so it shows as a dropdown in the Inspector
-    [SerializeField] private CursorMode cursorMode = CursorMode.Snap;
+    [SerializeField] private CursorMode cursorMode = CursorMode.Point;
 
     private Camera mainCam;
     private List<Collider2D> results = new();
@@ -43,31 +43,9 @@ public class Cursor : MonoBehaviour
         GameObject closestKey = null;
 
         // if (studyBehavior.StudySettings.cursorType == CursorType.PointCursor) {}
-        if (cursorMode == CursorMode.Point) {
-            // Point Cursor behaviour goes here
-
-            // Collider2D detectedCollider = null;
-            // Physics2D.OverlapCircle(transform.position, radius, contactFilter, results);
-
-            // //Detect how many targets
-            // //Change previous target back to default colour
-            // if (results.Count < 1)
-            // {
-            //     UnHoverPreviousKey();
-            // }
-            // else if (results.Count > 1)
-            // {
-            //     UnHoverPreviousKey();
-            //     Debug.LogWarning("Too many keys in area");
-            //     return;
-            // }
-            // else
-            // {
-            //     detectedCollider = results[0];
-            //     UnHoverPreviousKey(detectedCollider);
-            //     HoverKey(detectedCollider);
-            // }
-        } else if (cursorMode == CursorMode.Snap) {
+        if (cursorMode == CursorMode.DPad) {
+            // D-Pad behaviour goes here
+        } else {
             // Locating the nearest Key - Based on the distance to the nearest target to the Cursor
             foreach (GameObject currentKey in keys) {
                 float distanceToKey = Vector2.Distance(currentKey.transform.position, transform.position);
@@ -77,30 +55,28 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            if (distance < 0.7f) {
-                if (closestKey)
-                {
-                    if (previousDetectedKey != null && closestKey != previousDetectedKey) UnHoverPreviousKey();
-                    HoverKey(closestKey.GetComponent<Collider2D>());
+            if (cursorMode == CursorMode.Snap) {
+                // Snap Cursor behaviour
+            } else {
+                // Regular Point Cursor behaviour
+                if (distance < 0.7f) {
+                    if (closestKey) {
+                        if (previousDetectedKey != null && closestKey != previousDetectedKey) UnHoverPreviousKey();
+                        HoverKey(closestKey.GetComponent<Collider2D>());
+                    }
+                    // On Mouse Click, select the closest target
+                    if (Input.GetMouseButtonDown(0)) {
+                        SelectKey(closestKey.GetComponent<Collider2D>());
+                    }
+                    else if (Input.GetMouseButtonUp(0)) {
+                        DeSelectKey(closestKey);
+                    }
                 }
-
-                // On Mouse Click, select the closest target
-                if (Input.GetMouseButtonDown(0))
-                {
-                    SelectKey(closestKey.GetComponent<Collider2D>());
-                }
-                else if (Input.GetMouseButtonUp(0))
-                {
-                    DeSelectKey(closestKey);
+                else {
+                    UnHoverPreviousKey();
                 }
             }
-            else {
-                UnHoverPreviousKey();
-            }
-
             previousDetectedKey = closestKey;
-        } else {
-            // D-Pad behaviour goes here
         }
     }
 
