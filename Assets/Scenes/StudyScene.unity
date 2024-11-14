@@ -5908,7 +5908,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e58ed8793604922b53f35ae690d9b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorMode: 0
+  cursorMode: 1
+  decelerationThreshold: 0.05
+  minDistanceToSnap: 0.35
+  snapCooldownTime: 0.1
 --- !u!4 &2084846368
 Transform:
   m_ObjectHideFlags: 0

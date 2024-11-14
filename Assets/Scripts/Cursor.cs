@@ -76,17 +76,15 @@ public class Cursor : MonoBehaviour
                 Debug.Log("Attempting to snap. Distance: " + distance + ", Deceleration: " + IsDecelerating());
                 if (distance <= minDistanceToSnap && IsDecelerating())
                 {
-                    isSnapping = true;
                     SnapToKey(closestKey);
                 }
                 else
                 {
                     Debug.Log("Conditions not met for snapping.");
-                    isSnapping = false;
                 }
             }
 
-            if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance >= minDistanceToSnap || !IsDecelerating())
+            if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance <= minDistanceToSnap || !IsDecelerating())
             {
                 if (closestKey && previousDetectedKey != closestKey)
                 {
@@ -120,10 +118,12 @@ public class Cursor : MonoBehaviour
         {
             snapCooldownTimer = 0f;
             isStopped = true;
+            isSnapping = true;
             Debug.Log("Cursor stopped, starting cooldown.");
             return false;
         }
         
+        isSnapping = false;
         bool isDecelerating = speed < decelerationThreshold;
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
@@ -247,4 +247,4 @@ public class Cursor : MonoBehaviour
     // {
     //     Gizmos.DrawWireSphere(transform.position, radius);
     // }
-}
+// }
