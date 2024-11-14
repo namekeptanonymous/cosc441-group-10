@@ -2372,6 +2372,52 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2606199199c5c483caa521f1c130b672, type: 3}
+--- !u!1 &927051922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 927051924}
+  - component: {fileID: 927051923}
+  m_Layer: 0
+  m_Name: DPadController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &927051923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 927051922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91b886b9f7b2e4f30a85cfbcd8fba994, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keysParent: {fileID: 1613282861}
+  keysPerRow: 10
+--- !u!4 &927051924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 927051922}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &955837261
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5908,7 +5954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e58ed8793604922b53f35ae690d9b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorMode: 0
+  cursorMode: 2
 --- !u!4 &2084846368
 Transform:
   m_ObjectHideFlags: 0
@@ -5947,3 +5993,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 1472892993}
   - {fileID: 2084846368}
+  - {fileID: 927051924}
