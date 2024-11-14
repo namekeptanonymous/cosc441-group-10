@@ -19,10 +19,18 @@ public class Cursor : MonoBehaviour
     private GameObject previousDetectedKey;
     private GameObject[] keys;
 
+    private Vector3 previousMousePosition;
+    [SerializeField] private float decelerationThreshold = 0.1f; // adjust as needed
+    [SerializeField] private float minDistanceToSnap = 0.7f;
+    [SerializeField] private float snapCooldownTime = 0.5f; // Time after stopping before snapping resumes
+    private float snapCooldownTimer = 0f;
+    private bool isStopped = false;
+
     // Start is called before the first frame update
     void Start()
     {
         mainCam = Camera.main;
+        previousMousePosition = Input.mousePosition;
     }
 
     // Update is called once per frame
@@ -30,10 +38,8 @@ public class Cursor : MonoBehaviour
     {
         keys = GameObject.FindGameObjectsWithTag("Key");
 
-        //Get Mouse Position on screen, and get the corresponding position in a Vector3 World Co-Ordinate
+        // Get Mouse Position on screen and convert it to world position
         Vector3 mousePosition = Input.mousePosition;
-
-        //Change the z position so that cursor does not get occluded by the camera
         mousePosition.z += 9f;
         mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
         mousePosition.y = Mathf.Clamp(mousePosition.y, 0f, Screen.height);
@@ -42,7 +48,6 @@ public class Cursor : MonoBehaviour
         float distance = 9999f;
         GameObject closestKey = null;
 
-        // if (studyBehavior.StudySettings.cursorType == CursorType.PointCursor) {}
         if (cursorMode == CursorMode.DPad) {
             // D-Pad behaviour goes here
         } else {
@@ -55,9 +60,24 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            if (cursorMode == CursorMode.Snap) {
-                // Snap Cursor behaviour
-            } else {
+            // Update snap cooldown timer if cursor is stopped
+            if (isStopped)
+            {
+                snapCooldownTimer += Time.deltaTime;
+                if (snapCooldownTimer >= snapCooldownTime)
+                {
+                    isStopped = false; // Grace period has passed, snapping can resume if conditions are met
+                }
+            }
+
+            if (cursorMode == CursorMode.Snap && closestKey != null && !isStopped)
+            {
+                if (distance <= minDistanceToSnap && IsDecelerating())
+                {
+                    SnapToKey(closestKey);
+                }
+            }
+            else {
                 // Regular Point Cursor behaviour
                 if (distance < 0.7f) {
                     if (closestKey) {
@@ -78,6 +98,33 @@ public class Cursor : MonoBehaviour
             }
             previousDetectedKey = closestKey;
         }
+
+        previousMousePosition = Input.mousePosition;
+    }
+
+    private bool IsDecelerating()
+    {
+        // Calculate mouse movement speed
+        float speed = (Input.mousePosition - previousMousePosition).magnitude / Time.deltaTime;
+
+        // Detect if the cursor has stopped (speed near zero)
+        if (speed < Mathf.Epsilon)
+        {
+            snapCooldownTimer = 0f; // Reset snap timer since cursor just stopped
+            isStopped = true;
+            return false;
+        }
+        
+        // Check if speed is below the deceleration threshold
+        return speed < decelerationThreshold;
+    }
+
+    private void SnapToKey(GameObject key)
+    {
+        // Set in-game cursor position to the key position
+        transform.position = key.transform.position;
+
+        Debug.Log("Snapped to key: " + key.name);
     }
 
     private void HoverKey(Collider2D collider)
@@ -110,7 +157,7 @@ public class Cursor : MonoBehaviour
     void SelectKey(Collider2D collider)
     {
         if (collider == null)  {
-            // // If nothing was clicked, count it as a misclick
+            // If nothing was clicked, count it as a misclick
             // if (FindObjectOfType<Key>() == null)
             // {
             //     studyBehavior.HandleMisClick();
