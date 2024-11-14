@@ -11,7 +11,6 @@ public class Cursor : MonoBehaviour
         DPad
     }
 
-    // Serialize the enum field so it shows as a dropdown in the Inspector
     [SerializeField] private CursorMode cursorMode = CursorMode.Point;
 
     private Camera mainCam;
@@ -20,40 +19,40 @@ public class Cursor : MonoBehaviour
     private GameObject[] keys;
 
     private Vector3 previousMousePosition;
-    [SerializeField] private float decelerationThreshold = 0.1f; // Adjust as needed in Inspector
-    [SerializeField] private float minDistanceToSnap = 0.7f;     // Distance within which snapping can occur
-    [SerializeField] private float snapCooldownTime = 0.5f;      // Time after stopping before snapping resumes
+    [SerializeField] private float decelerationThreshold = 0.1f;
+    [SerializeField] private float minDistanceToSnap = 0.7f;
+    [SerializeField] private float snapCooldownTime = 0.5f;
     private float snapCooldownTimer = 0f;
     private bool isStopped = false;
+    private bool isSnapping = false; // New variable to track if snapping is active
 
-    // Start is called before the first frame update
     void Start()
     {
         mainCam = Camera.main;
         previousMousePosition = Input.mousePosition;
     }
 
-    // Update is called once per frame
     void Update()
     {
         keys = GameObject.FindGameObjectsWithTag("Key");
 
-        // Get Mouse Position on screen and convert it to world position
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z += 9f;
-        mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
-        mousePosition.y = Mathf.Clamp(mousePosition.y, 0f, Screen.height);
-        transform.position = mainCam.ScreenToWorldPoint(mousePosition);
+        // Update cursor position based on mouse position only if not snapping
+        if (!isSnapping)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z += 9f;
+            mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
+            mousePosition.y = Mathf.Clamp(mousePosition.y, 0f, Screen.height);
+            transform.position = mainCam.ScreenToWorldPoint(mousePosition);
+        }
 
         float distance = 9999f;
         GameObject closestKey = null;
 
         if (cursorMode == CursorMode.DPad) {
-            // D-Pad behaviour goes here
             Debug.Log("DPad mode is not implemented.");
         } 
         else {
-            // Find the nearest Key
             foreach (GameObject currentKey in keys) {
                 float distanceToKey = Vector2.Distance(currentKey.transform.position, transform.position);
                 if (distanceToKey < distance) {
@@ -62,32 +61,31 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            // Update snap cooldown timer if cursor is stopped
             if (isStopped)
             {
                 snapCooldownTimer += Time.deltaTime;
                 if (snapCooldownTimer >= snapCooldownTime)
                 {
-                    isStopped = false; // Grace period has passed, snapping can resume if conditions are met
+                    isStopped = false;
                     Debug.Log("Snap cooldown ended, snapping can resume.");
                 }
             }
 
-            // Snapping logic
             if (cursorMode == CursorMode.Snap && closestKey != null && !isStopped)
             {
                 Debug.Log("Attempting to snap. Distance: " + distance + ", Deceleration: " + IsDecelerating());
                 if (distance <= minDistanceToSnap && IsDecelerating())
                 {
+                    isSnapping = true;
                     SnapToKey(closestKey);
                 }
                 else
                 {
                     Debug.Log("Conditions not met for snapping.");
+                    isSnapping = false;
                 }
             }
 
-            // Regular Point Cursor behaviour if snapping conditions are not met
             if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance >= minDistanceToSnap || !IsDecelerating())
             {
                 if (closestKey && previousDetectedKey != closestKey)
@@ -100,7 +98,6 @@ public class Cursor : MonoBehaviour
                     previousDetectedKey = closestKey;
                 }
 
-                // Handle selection/deselection
                 if (Input.GetMouseButtonDown(0) && closestKey != null)
                 {
                     SelectKey(closestKey.GetComponent<Collider2D>());
@@ -117,19 +114,16 @@ public class Cursor : MonoBehaviour
 
     private bool IsDecelerating()
     {
-        // Calculate mouse movement speed
         float speed = (Input.mousePosition - previousMousePosition).magnitude / Time.deltaTime;
 
-        // Detect if the cursor has stopped (speed near zero)
         if (speed < Mathf.Epsilon)
         {
-            snapCooldownTimer = 0f; // Reset snap timer since cursor just stopped
+            snapCooldownTimer = 0f;
             isStopped = true;
             Debug.Log("Cursor stopped, starting cooldown.");
             return false;
         }
         
-        // Check if speed is below the deceleration threshold
         bool isDecelerating = speed < decelerationThreshold;
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
@@ -137,9 +131,11 @@ public class Cursor : MonoBehaviour
 
     private void SnapToKey(GameObject key)
     {
-        // Set in-game cursor position to the key position
-        transform.position = key.transform.position;
-        Debug.Log("Snapped to key: " + key.name);
+        if (key != null)
+        {
+            transform.position = key.transform.position;
+            Debug.Log("Snapped to key: " + key.name);
+        }
     }
 
     private void HoverKey(Collider2D collider)
@@ -171,9 +167,7 @@ public class Cursor : MonoBehaviour
 
     private void SelectKey(Collider2D collider)
     {
-        if (collider == null)  {
-            return;
-        }
+        if (collider == null) return;
         if (collider.TryGetComponent(out KeyboardKey k)) {
             k.OnSelect();
         }
@@ -182,6 +176,8 @@ public class Cursor : MonoBehaviour
         }
     }
 }
+
+
 
 
     // OLD CODE BELOW (for reference):
@@ -209,4 +205,46 @@ public class Cursor : MonoBehaviour
 
     //     if (studyBehavior.StudySettings.cursorType == CursorType.PointCursor)
     //     {
-    //   
+    //         // Point Cursor behaviour
+    //         transform.localScale = new Vector2(0,0);
+    //         radius = 0f;
+    //     }
+
+    //     Collider2D detectedCollider = null;
+
+    //     Physics2D.OverlapCircle(transform.position, radius, contactFilter, results);
+
+    //     //Detect how many targets
+    //     //Change previous target back to default colour
+    //     if (results.Count < 1)
+    //     {
+    //         UnHoverPreviousKey();
+    //     }
+    //     else if (results.Count > 1)
+    //     {
+    //         UnHoverPreviousKey();
+    //         Debug.LogWarning("Too many targets in area");
+    //         return;
+    //     }
+    //     else
+    //     {
+    //         detectedCollider = results[0];
+    //         UnHoverPreviousKey(detectedCollider);
+    //         HoverKey(detectedCollider);
+    //     }
+
+    //     // On Mouse Click, select the closest target
+    //     if (Input.GetMouseButtonDown(0))
+    //     {
+    //         SelectTarget(detectedCollider);
+    //     }
+
+    //     previousDetectedKey = detectedCollider;
+    // }
+
+    // //Debug code
+    // private void OnDrawGizmos()
+    // {
+    //     Gizmos.DrawWireSphere(transform.position, radius);
+    // }
+}
