@@ -2372,6 +2372,52 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2606199199c5c483caa521f1c130b672, type: 3}
+--- !u!1 &927051922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 927051924}
+  - component: {fileID: 927051923}
+  m_Layer: 0
+  m_Name: DPadController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &927051923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 927051922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91b886b9f7b2e4f30a85cfbcd8fba994, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keysParent: {fileID: 1613282861}
+  keysPerRow: 10
+--- !u!4 &927051924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 927051922}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &955837261
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5036,45 +5082,45 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1293117148}
-  - {fileID: 2020364416}
-  - {fileID: 1113804327}
-  - {fileID: 246191102}
-  - {fileID: 349451211}
-  - {fileID: 2049446839}
-  - {fileID: 574474178}
-  - {fileID: 329332862}
   - {fileID: 519966101}
-  - {fileID: 2070181166}
-  - {fileID: 2099875993}
-  - {fileID: 720692419}
+  - {fileID: 349451211}
   - {fileID: 176025678}
-  - {fileID: 327330098}
-  - {fileID: 2140472320}
-  - {fileID: 1380863213}
-  - {fileID: 1154196898}
-  - {fileID: 244080371}
-  - {fileID: 1722379258}
-  - {fileID: 180775}
-  - {fileID: 2029412214}
-  - {fileID: 694690987}
-  - {fileID: 53259308}
-  - {fileID: 138286660}
-  - {fileID: 1476471236}
-  - {fileID: 2111497875}
-  - {fileID: 1909414622}
-  - {fileID: 1492194252}
-  - {fileID: 1166810709}
-  - {fileID: 906445790}
-  - {fileID: 1694084558}
-  - {fileID: 1208659292}
   - {fileID: 1759736683}
-  - {fileID: 10110658}
-  - {fileID: 1110302274}
-  - {fileID: 1172091560}
+  - {fileID: 1208659292}
+  - {fileID: 180775}
+  - {fileID: 1492194252}
+  - {fileID: 1909414622}
   - {fileID: 1119179917}
+  - {fileID: 2020364416}
+  - {fileID: 329332862}
+  - {fileID: 2070181166}
+  - {fileID: 327330098}
   - {fileID: 626844961}
+  - {fileID: 1722379258}
+  - {fileID: 2029412214}
+  - {fileID: 1166810709}
+  - {fileID: 2111497875}
+  - {fileID: 1172091560}
+  - {fileID: 1113804327}
+  - {fileID: 574474178}
+  - {fileID: 2099875993}
+  - {fileID: 2140472320}
   - {fileID: 10545872}
+  - {fileID: 244080371}
+  - {fileID: 694690987}
+  - {fileID: 906445790}
+  - {fileID: 1476471236}
+  - {fileID: 1110302274}
+  - {fileID: 246191102}
+  - {fileID: 2049446839}
+  - {fileID: 720692419}
+  - {fileID: 1380863213}
   - {fileID: 1814919278}
+  - {fileID: 1154196898}
+  - {fileID: 53259308}
+  - {fileID: 1694084558}
+  - {fileID: 138286660}
+  - {fileID: 10110658}
   m_Father: {fileID: 667564035}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1694084558 stripped
@@ -5950,3 +5996,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 1472892993}
   - {fileID: 2084846368}
+  - {fileID: 927051924}
