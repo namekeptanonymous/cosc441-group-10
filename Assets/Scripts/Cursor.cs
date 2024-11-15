@@ -24,7 +24,7 @@ public class Cursor : MonoBehaviour
     [SerializeField] private float snapCooldownTime = 0.5f;
     private float snapCooldownTimer = 0f;
     private bool isStopped = false;
-    private bool isSnapping = false;
+    private bool isSnapping = false; // New variable to track if snapping is active
 
     void Start()
     {
@@ -37,7 +37,7 @@ public class Cursor : MonoBehaviour
         keys = GameObject.FindGameObjectsWithTag("Key");
 
         // Update cursor position based on mouse position only if not snapping
-        if (!isSnapping)
+        if (!isSnapping || !isStopped)
         {
             Vector3 mousePosition = Input.mousePosition;
             mousePosition.z += 9f;
@@ -46,7 +46,7 @@ public class Cursor : MonoBehaviour
             transform.position = mainCam.ScreenToWorldPoint(mousePosition);
         }
 
-        float distance = Mathf.Infinity;
+        float distance = 9999f;
         GameObject closestKey = null;
 
         if (cursorMode == CursorMode.DPad) {
@@ -61,20 +61,6 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            // Check if snapping conditions are met
-            if (cursorMode == CursorMode.Snap && closestKey != null && distance <= minDistanceToSnap && IsDecelerating())
-            {
-                Debug.Log("Snapping to key within range.");
-                SnapToKey(closestKey);
-                isSnapping = true; // Enable snapping mode
-            }
-            else
-            {
-                Debug.Log("Conditions not met for snapping, normal movement.");
-                isSnapping = false; // Disable snapping mode for normal movement
-            }
-
-            // Reset snap cooldown if cursor stopped moving
             if (isStopped)
             {
                 snapCooldownTimer += Time.deltaTime;
@@ -85,10 +71,31 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            // Handle Hover Logic in Point and Snap modes
-            if (cursorMode == CursorMode.Point || (cursorMode == CursorMode.Snap && !isSnapping))
+            if (cursorMode == CursorMode.Snap && closestKey != null && !isStopped)
             {
-                HandleHoverLogic();
+                Debug.Log("Attempting to snap. Distance: " + distance + ", Deceleration: " + IsDecelerating());
+                if (distance <= minDistanceToSnap && IsDecelerating())
+                {
+                    SnapToKey(closestKey);
+                }
+                else
+                {   
+                    // isStopped = false;
+                    Debug.Log("Conditions not met for snapping.");
+                }
+            }
+
+            if (cursorMode != CursorMode.DPad && distance <= minDistanceToSnap)
+            {
+                if (closestKey && previousDetectedKey != closestKey)
+                {
+                    if (previousDetectedKey != null)
+                    {
+                        UnHoverPreviousKey();
+                    }
+                    HoverKey(closestKey.GetComponent<Collider2D>());
+                    previousDetectedKey = closestKey;
+                }
 
                 if (Input.GetMouseButtonDown(0) && closestKey != null)
                 {
@@ -112,10 +119,12 @@ public class Cursor : MonoBehaviour
         {
             snapCooldownTimer = 0f;
             isStopped = true;
+            isSnapping = true;
             Debug.Log("Cursor stopped, starting cooldown.");
             return false;
         }
         
+        isSnapping = false;
         bool isDecelerating = speed < decelerationThreshold;
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
@@ -126,41 +135,7 @@ public class Cursor : MonoBehaviour
         if (key != null)
         {
             transform.position = key.transform.position;
-            Debug.Log("Snapped to key: " + key.name + " at position " + transform.position);
-        }
-    }
-
-    private void HandleHoverLogic()
-    {
-        GameObject hoveredKey = null;
-
-        // Check if the cursor is within bounds of any key using OverlapPoint
-        foreach (GameObject key in keys)
-        {
-            Collider2D keyCollider = key.GetComponent<Collider2D>();
-            if (keyCollider != null && keyCollider.OverlapPoint(transform.position))
-            {
-                hoveredKey = key;
-                break;
-            }
-        }
-
-        // Hover over a new key if it has changed
-        if (hoveredKey != previousDetectedKey)
-        {
-            // Clear previous hover effect if a new key is detected
-            if (previousDetectedKey != null)
-            {
-                UnHoverPreviousKey();
-            }
-
-            // Apply hover effect if we are over a new key
-            if (hoveredKey != null)
-            {
-                HoverKey(hoveredKey.GetComponent<Collider2D>());
-            }
-
-            previousDetectedKey = hoveredKey; // Update previous detected key
+            Debug.Log("Snapped to key: " + key.name);
         }
     }
 
@@ -202,8 +177,6 @@ public class Cursor : MonoBehaviour
         }
     }
 }
-
-
 
 
 
