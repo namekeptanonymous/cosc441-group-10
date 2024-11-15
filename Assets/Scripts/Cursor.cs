@@ -24,7 +24,7 @@ public class Cursor : MonoBehaviour
     [SerializeField] private float snapCooldownTime = 0.5f;
     private float snapCooldownTimer = 0f;
     private bool isStopped = false;
-    private bool isSnapping = false; // New variable to track if snapping is active
+    private bool isSnapping = false;
 
     void Start()
     {
@@ -84,17 +84,10 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance <= minDistanceToSnap || !IsDecelerating())
+            if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance >= minDistanceToSnap || !IsDecelerating())
             {
-                if (closestKey && previousDetectedKey != closestKey)
-                {
-                    if (previousDetectedKey != null)
-                    {
-                        UnHoverPreviousKey();
-                    }
-                    HoverKey(closestKey.GetComponent<Collider2D>());
-                    previousDetectedKey = closestKey;
-                }
+                // Updated hover logic
+                HandleHoverLogic();
 
                 if (Input.GetMouseButtonDown(0) && closestKey != null)
                 {
@@ -138,6 +131,39 @@ public class Cursor : MonoBehaviour
         }
     }
 
+    private void HandleHoverLogic()
+    {
+        GameObject hoveredKey = null;
+
+        // Check if the cursor is within bounds of any key using OverlapPoint
+        foreach (GameObject key in keys)
+        {
+            Collider2D keyCollider = key.GetComponent<Collider2D>();
+            if (keyCollider != null && keyCollider.OverlapPoint(transform.position))
+            {
+                hoveredKey = key;
+                break;
+            }
+        }
+
+        // Hover over a new key if it has changed
+        if (hoveredKey != null && hoveredKey != previousDetectedKey)
+        {
+            if (previousDetectedKey != null)
+            {
+                UnHoverPreviousKey();
+            }
+            HoverKey(hoveredKey.GetComponent<Collider2D>());
+            previousDetectedKey = hoveredKey;
+        }
+        else if (hoveredKey == null && previousDetectedKey != null)
+        {
+            // Unhover if we are no longer over any key
+            UnHoverPreviousKey();
+            previousDetectedKey = null;
+        }
+    }
+
     private void HoverKey(Collider2D collider)
     {
         if (collider.TryGetComponent(out KeyboardKey keyboardKey)) {
@@ -176,6 +202,7 @@ public class Cursor : MonoBehaviour
         }
     }
 }
+
 
 
 
