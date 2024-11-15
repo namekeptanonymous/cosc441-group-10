@@ -46,7 +46,7 @@ public class Cursor : MonoBehaviour
             transform.position = mainCam.ScreenToWorldPoint(mousePosition);
         }
 
-        float distance = 9999f;
+        float distance = Mathf.Infinity;
         GameObject closestKey = null;
 
         if (cursorMode == CursorMode.DPad) {
@@ -61,6 +61,20 @@ public class Cursor : MonoBehaviour
                 }
             }
 
+            // Check if snapping conditions are met
+            if (cursorMode == CursorMode.Snap && closestKey != null && distance <= minDistanceToSnap && IsDecelerating())
+            {
+                Debug.Log("Snapping to key within range.");
+                SnapToKey(closestKey);
+                isSnapping = true; // Enable snapping mode
+            }
+            else
+            {
+                Debug.Log("Conditions not met for snapping, normal movement.");
+                isSnapping = false; // Disable snapping mode for normal movement
+            }
+
+            // Reset snap cooldown if cursor stopped moving
             if (isStopped)
             {
                 snapCooldownTimer += Time.deltaTime;
@@ -71,22 +85,9 @@ public class Cursor : MonoBehaviour
                 }
             }
 
-            if (cursorMode == CursorMode.Snap && closestKey != null && !isStopped)
+            // Handle Hover Logic in Point and Snap modes
+            if (cursorMode == CursorMode.Point || (cursorMode == CursorMode.Snap && !isSnapping))
             {
-                Debug.Log("Attempting to snap. Distance: " + distance + ", Deceleration: " + IsDecelerating());
-                if (distance <= minDistanceToSnap && IsDecelerating())
-                {
-                    SnapToKey(closestKey);
-                }
-                else
-                {
-                    Debug.Log("Conditions not met for snapping.");
-                }
-            }
-
-            if (cursorMode == CursorMode.Point || cursorMode != CursorMode.Snap || distance >= minDistanceToSnap || !IsDecelerating())
-            {
-                // Updated hover logic
                 HandleHoverLogic();
 
                 if (Input.GetMouseButtonDown(0) && closestKey != null)
@@ -111,12 +112,10 @@ public class Cursor : MonoBehaviour
         {
             snapCooldownTimer = 0f;
             isStopped = true;
-            isSnapping = true;
             Debug.Log("Cursor stopped, starting cooldown.");
             return false;
         }
         
-        isSnapping = false;
         bool isDecelerating = speed < decelerationThreshold;
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
@@ -127,7 +126,7 @@ public class Cursor : MonoBehaviour
         if (key != null)
         {
             transform.position = key.transform.position;
-            Debug.Log("Snapped to key: " + key.name);
+            Debug.Log("Snapped to key: " + key.name + " at position " + transform.position);
         }
     }
 
@@ -147,20 +146,21 @@ public class Cursor : MonoBehaviour
         }
 
         // Hover over a new key if it has changed
-        if (hoveredKey != null && hoveredKey != previousDetectedKey)
+        if (hoveredKey != previousDetectedKey)
         {
+            // Clear previous hover effect if a new key is detected
             if (previousDetectedKey != null)
             {
                 UnHoverPreviousKey();
             }
-            HoverKey(hoveredKey.GetComponent<Collider2D>());
-            previousDetectedKey = hoveredKey;
-        }
-        else if (hoveredKey == null && previousDetectedKey != null)
-        {
-            // Unhover if we are no longer over any key
-            UnHoverPreviousKey();
-            previousDetectedKey = null;
+
+            // Apply hover effect if we are over a new key
+            if (hoveredKey != null)
+            {
+                HoverKey(hoveredKey.GetComponent<Collider2D>());
+            }
+
+            previousDetectedKey = hoveredKey; // Update previous detected key
         }
     }
 
@@ -202,6 +202,7 @@ public class Cursor : MonoBehaviour
         }
     }
 }
+
 
 
 
