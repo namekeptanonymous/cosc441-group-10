@@ -5,66 +5,90 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // [SerializeField] private TMP_InputField inputField;
-    // [SerializeField] private TMP_InputField cursorTypeInputField;
-    // private Cursor gameCursor;
-    // private StudyBehavior studyBehavior;
-    // private int participantID;
-    // private CursorType cursorType;
+    [SerializeField] private TMP_InputField participantIDInputField;
+    [SerializeField] private TMP_InputField cursorModeInputField;
 
-    // private void Awake()
-    // {
-    //     DontDestroyOnLoad(this);
-    // }
+    private Cursor gameCursor;
+    private StudyBehavior studyBehavior;
+    private int participantID;
+    private Cursor.CursorMode cursorMode;
 
-    // public void StartStudy()
-    // {
-    //     if (inputField.text == string.Empty) return;
-    //     else if (cursorTypeInputField.text == string.Empty) return;
+    private void Awake()
+    {
+        DontDestroyOnLoad(this); // Persist GameManager across scenes
+    }
 
-    //     participantID = int.Parse(inputField.text);
-    //     if (cursorTypeInputField.text.Equals("point", StringComparison.OrdinalIgnoreCase) || cursorTypeInputField.text.Equals("p", StringComparison.OrdinalIgnoreCase)) {
-    //         cursorType = CursorType.PointCursor;
-    //     } else if (cursorTypeInputField.text.Equals("bubble", StringComparison.OrdinalIgnoreCase) || cursorTypeInputField.text.Equals("b", StringComparison.OrdinalIgnoreCase)) {
-    //         cursorType = CursorType.BubbleCursor;
-    //     } else {
-    //         Debug.LogError("Invalid cursor type!");
-    //         return;
-    //     }
+    public void StartStudy()
+    {
+        // Validate inputs
+        if (string.IsNullOrWhiteSpace(participantIDInputField.text))
+        {
+            Debug.LogError("Participant ID is required!");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(cursorModeInputField.text))
+        {
+            Debug.LogError("Cursor mode is required!");
+            return;
+        }
+        if (!int.TryParse(participantIDInputField.text, out participantID))
+        {
+            Debug.LogError("Invalid participant ID!");
+            return;
+        }
+        string modeInput = cursorModeInputField.text.Trim().ToUpper();
+        switch (modeInput)
+        {
+            case "P":
+            case "POINT":
+                cursorMode = Cursor.CursorMode.Point;
+                break;
 
-    //     SceneManager.LoadScene("StudyScene");
-    //     SceneManager.sceneLoaded += OnGameSceneLoaded;
-    // }
+            case "S":
+            case "SNAP":
+                cursorMode = Cursor.CursorMode.Snap;
+                break;
 
-    // private void OnGameSceneLoaded(Scene scene, LoadSceneMode mode)
-    // {
-    //     gameCursor = FindObjectOfType<Cursor>();
-    //     studyBehavior = FindObjectOfType<StudyBehavior>();
+            case "D":
+            case "DPAD":
+                cursorMode = Cursor.CursorMode.DPad;
+                break;
 
-    //     if (gameCursor == null || studyBehavior == null)
-    //     {
-    //         Debug.LogError("Cursor or StudyBehavior not found in the scene!");
-    //         return;
-    //     }
+            default:
+                Debug.LogError("Invalid cursor mode! Use 'C' for Cursor, 'S' for Snap, or 'D' for DPad.");
+                return;
+        }
 
-    //     studyBehavior.ParticipantID = participantID;
-        
-    //     CSVManager.SetFilePath(cursorType.ToString());
-    //     SetCursor(cursorType);
+        SceneManager.LoadScene("StudyScene");
+        SceneManager.sceneLoaded += OnStudySceneLoaded;
+    }
 
-    //     // Unsubscribe from the sceneLoaded event to avoid duplicate calls
-    //     SceneManager.sceneLoaded -= OnGameSceneLoaded;
-    // }
+    private void OnStudySceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        gameCursor = FindObjectOfType<Cursor>();
+        studyBehavior = FindObjectOfType<StudyBehavior>();
 
-    // public void SetCursor(CursorType cursor)
-    // {
-    //     if (gameCursor == null) return;
-    //     studyBehavior.StudySettings.cursorType = cursor;
-    //     gameCursor.radius = cursor switch
-    //     {
-    //         CursorType.PointCursor => 0f,
-    //         CursorType.BubbleCursor => 10f,
-    //         _ => throw new ArgumentOutOfRangeException(nameof(cursor), cursor, null)
-    //     };
-    // }
+        if (gameCursor == null || studyBehavior == null)
+        {
+            Debug.LogError("Cursor or StudyBehavior not found in the scene!");
+            return;
+        }
+
+        studyBehavior.ParticipantID = participantID;
+
+        CSVManager.SetFilePath(cursorMode.ToString());
+        ApplyCursorMode(cursorMode);
+
+        SceneManager.sceneLoaded -= OnStudySceneLoaded;
+    }
+
+    private void ApplyCursorMode(Cursor.CursorMode mode)
+    {
+        if (gameCursor == null)
+        {
+            Debug.LogError("Cursor not found!");
+            return;
+        }
+        gameCursor.SetCursorMode(mode);
+    }
 }

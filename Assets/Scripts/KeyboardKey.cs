@@ -38,6 +38,8 @@ public class KeyboardKey : MonoBehaviour
         Color currentColor = sprite.color;
         sprite.color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.2f);
         Debug.Log("Key "+gameObject.name+" was pressed.");
+
+        FindObjectOfType<StudyBehavior>()?.RegisterKeyPress(gameObject.name);
     }
 
     public void OnDeSelect()

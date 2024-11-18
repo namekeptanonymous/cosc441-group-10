@@ -73,9 +73,13 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Temporarily added to avoid Unity version difference issues
-/Packages/manifest.json
-/Packages/packages-lock.json
-/ProjectSettings/ProjectVersion.txt
+manifest.json
+ProjectVersion.txt
+BurstAotSettings_StandaloneOSX.json
+BurstAotSettings_StandaloneWindows.json
+CommonBurstAotSettings.json
+data_*.csv
+data_*.csv.meta
 
 # Miscellaneous
 .DS_Store

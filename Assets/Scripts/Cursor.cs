@@ -111,6 +111,11 @@ public class Cursor : MonoBehaviour
         previousMousePosition = Input.mousePosition;
     }
 
+    public void SetCursorMode(CursorMode mode)
+    {
+        cursorMode = mode;
+    }
+
     private bool IsDecelerating()
     {
         float speed = (Input.mousePosition - previousMousePosition).magnitude / Time.deltaTime;
