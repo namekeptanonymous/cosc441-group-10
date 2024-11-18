@@ -11,7 +11,7 @@ public class Cursor : MonoBehaviour
         DPad
     }
 
-    [SerializeField] private CursorMode cursorMode = CursorMode.Point;
+    [SerializeField] private CursorMode cursorMode;
 
     private Camera mainCam;
     private List<Collider2D> results = new();
@@ -48,6 +48,10 @@ public class Cursor : MonoBehaviour
 
         float distance = 9999f;
         GameObject closestKey = null;
+
+        if (cursorMode == CursorMode.Snap) {
+            Debug.Log("Cursor mode is " + cursorMode);
+        }
 
         if (cursorMode == CursorMode.DPad) {
             Debug.Log("DPad mode is not implemented.");

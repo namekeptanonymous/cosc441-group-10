@@ -104,18 +104,15 @@ public class StudyBehavior : MonoBehaviour
 
     private void CreateBlock()
     {
-        foreach (Cursor.CursorMode mode in studySettings.cursorModes)
+        foreach (string word in studySettings.wordsToType)
         {
             for (int i = 0; i < repetitions; i++)
             {
-                foreach (string word in studySettings.wordsToType)
+                blockSequence.Add(new TrialConditions()
                 {
-                    blockSequence.Add(new TrialConditions()
-                    {
-                        cursorMode = mode,
-                        word = word
-                    });
-                }
+                    cursorMode = studySettings.cursorModes[0],
+                    word = word
+                });
             }
         }
         blockSequence = YatesShuffle(blockSequence);
@@ -126,7 +123,6 @@ public class StudyBehavior : MonoBehaviour
         if (cursor == null) return;
 
         TrialConditions trial = CurrentTrial;
-        cursor.SetCursorMode(trial.cursorMode);
         typedWord = ""; // Reset the typed word
 
         Debug.Log($"Trial {currentTrialIndex + 1}/{blockSequence.Count}: " +
