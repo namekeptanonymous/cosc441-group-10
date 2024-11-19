@@ -2577,6 +2577,7 @@ GameObject:
   - component: {fileID: 906538601}
   - component: {fileID: 906538600}
   - component: {fileID: 906538599}
+  - component: {fileID: 906538602}
   m_Layer: 0
   m_Name: WordBeingTyped
   m_TagString: Untagged
@@ -2604,7 +2605,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (word here)
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2737,6 +2738,18 @@ RectTransform:
   m_AnchoredPosition: {x: -0.7571336, y: -0.8318177}
   m_SizeDelta: {x: 1.0095, y: 0.2524}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &906538602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906538598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be6805ed30277449e948508cf628aaa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &919825735
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4041,16 +4054,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60b8f547a6089450890bd84b0dffa535, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordBeingTyped: {fileID: 906538599}
+  WordToType: {fileID: 1706023047}
   studySettings:
     wordsToType:
-    - cow
+    - ABROAD
+    - DOCUMENTARY
+    - VLOG
+    - WALKTHROUGH
     cursorModes: 00000000
   repetitions: 2
   blockSequence:
   - cursorMode: 0
-    word: 
-  - cursorMode: 0
-    word: 
+    word: RED
+  typedWord: 
+  nextCorrectLetter: 
 --- !u!4 &1247769912
 Transform:
   m_ObjectHideFlags: 0
@@ -5747,7 +5765,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (word here)
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,6 +20,8 @@ public class StudySettings
 
 public class StudyBehavior : MonoBehaviour
 {
+    [SerializeField] private TMP_Text WordBeingTyped;
+    [SerializeField] private TMP_Text WordToType;
     public TrialConditions CurrentTrial => blockSequence[currentTrialIndex];
     public StudySettings StudySettings => studySettings;
 
@@ -35,7 +38,9 @@ public class StudyBehavior : MonoBehaviour
     
     private float timer = 0f;
     private int currentTrialIndex = 0;
-    private string typedWord = ""; // Tracks the word being typed
+    private int numOfTypos = 0;
+    public string typedWord = ""; // Tracks the word being typed
+    public string nextCorrectLetter = ""; // Tracks the next letter to be typed
     private Cursor cursor;
 
     private string[] header =
@@ -43,9 +48,8 @@ public class StudyBehavior : MonoBehaviour
         "PID",
         "CursorMode",
         "Word",
-        "TypedWord",
         "CompletionTime",
-        "MissedKeys"
+        "NumOfTypos"
     };
 
     void Awake()
@@ -73,6 +77,16 @@ public class StudyBehavior : MonoBehaviour
     public void RegisterKeyPress(string key)
     {
         typedWord += key;
+        Debug.Log($"Typed word: {typedWord}");
+        WordBeingTyped.text = typedWord;
+        if (typedWord.Length < CurrentTrial.word.Length)
+        {
+            nextCorrectLetter = CurrentTrial.word[typedWord.Length].ToString();
+        }
+        else
+        {
+            nextCorrectLetter = "";
+        }
 
         // Check if the typed word matches the trial's word
         if (typedWord.Equals(CurrentTrial.word, StringComparison.OrdinalIgnoreCase))
@@ -82,9 +96,10 @@ public class StudyBehavior : MonoBehaviour
         }
     }
 
-    public void HandleMissedKey()
+    public void HandleTypo()
     {
-        Debug.Log("Missed key!");
+        numOfTypos++;
+        Debug.Log("Typo entered!");
     }
 
     public void NextTrial()
@@ -124,6 +139,10 @@ public class StudyBehavior : MonoBehaviour
 
         TrialConditions trial = CurrentTrial;
         typedWord = ""; // Reset the typed word
+        nextCorrectLetter = trial.word[0].ToString();
+
+        WordBeingTyped.text = "";
+        WordToType.text = trial.word;
 
         Debug.Log($"Trial {currentTrialIndex + 1}/{blockSequence.Count}: " +
                   $"Cursor Mode = {trial.cursorMode}, Word = {trial.word}");
@@ -141,13 +160,13 @@ public class StudyBehavior : MonoBehaviour
             participantID.ToString(),
             CurrentTrial.cursorMode.ToString(),
             CurrentTrial.word,
-            typedWord,
             (timer * 1000).ToString(),
-            (CurrentTrial.word.Length - typedWord.Length).ToString() // Missed keys
+            numOfTypos.ToString()
         };
 
         CSVManager.AppendToCSV(data);
         timer = 0f;
+        numOfTypos = 0;
     }
 
     public void SetParticipantID(int ID)
