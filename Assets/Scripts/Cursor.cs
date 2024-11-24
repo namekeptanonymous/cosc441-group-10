@@ -19,12 +19,13 @@ public class Cursor : MonoBehaviour
     private GameObject[] keys;
 
     private Vector3 previousMousePosition;
+    private float previousSpeed = 0f;
     [SerializeField] private float decelerationThreshold = 0.1f;
     [SerializeField] private float minDistanceToSnap = 0.7f;
     [SerializeField] private float snapCooldownTime = 0.5f;
     private float snapCooldownTimer = 0f;
     private bool isStopped = false;
-    private bool isSnapping = false; // New variable to track if snapping is active
+    private bool isSnapping = false; // Tracks if snapping is active
 
     void Start()
     {
@@ -49,17 +50,17 @@ public class Cursor : MonoBehaviour
         float distance = 9999f;
         GameObject closestKey = null;
 
-        if (cursorMode == CursorMode.Snap) {
-            Debug.Log("Cursor mode is " + cursorMode);
-        }
-
-        if (cursorMode == CursorMode.DPad) {
+        if (cursorMode == CursorMode.DPad)
+        {
             Debug.Log("DPad mode is not implemented.");
-        } 
-        else {
-            foreach (GameObject currentKey in keys) {
+        }
+        else
+        {
+            foreach (GameObject currentKey in keys)
+            {
                 float distanceToKey = Vector2.Distance(currentKey.transform.position, transform.position);
-                if (distanceToKey < distance) {
+                if (distanceToKey < distance)
+                {
                     distance = distanceToKey;
                     closestKey = currentKey;
                 }
@@ -83,8 +84,7 @@ public class Cursor : MonoBehaviour
                     SnapToKey(closestKey);
                 }
                 else
-                {   
-                    // isStopped = false;
+                {
                     Debug.Log("Conditions not met for snapping.");
                 }
             }
@@ -132,36 +132,77 @@ public class Cursor : MonoBehaviour
             Debug.Log("Cursor stopped, starting cooldown.");
             return false;
         }
-        
-        isSnapping = false;
-        bool isDecelerating = speed < decelerationThreshold;
+
+        bool isDecelerating = speed < previousSpeed && speed < decelerationThreshold;
+        previousSpeed = speed; // Update previous speed for next frame
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
+        
+        // NEW CODE BELOW, DOESN'T WORK!!!
+        // float currentSpeed = (Input.mousePosition - previousPosition).magnitude / Time.deltaTime;
+        // float speedChange = currentSpeed - previousSpeed;
+        // previousSpeed = currentSpeed;
+
+        // // If speed change (acceleration) is -ve and its magnitude is above the threshold, it's decelerating
+        // if (speedChange < 0 && Mathf.Abs(speedChange) > decelerationThreshold)
+        // {
+        //     Debug.Log($"Speed: {currentSpeed} | Speed Change: {speedChange} | Threshold: {decelerationThreshold} | Input Mouse Position: {Input.mousePosition} | Previous Mouse Position: {previousPosition}");
+        //     snapCooldownTimer = 0f;
+        //     isStopped = true;
+        //     isSnapping = true;
+        //     Debug.Log("Cursor is decelerating, starting cooldown.");
+        //     return true;
+        // }
+
+        // // If not decelerating, reset snapping state
+        // isSnapping = false;
+        // return false;
+
     }
 
     private void SnapToKey(GameObject key)
     {
         if (key != null)
         {
-            transform.position = key.transform.position;
-            Debug.Log("Snapped to key: " + key.name);
+            StartCoroutine(SmoothSnap(key.transform.position));
         }
+    }
+
+    private IEnumerator SmoothSnap(Vector3 targetPosition)
+    {
+        isSnapping = true; // Lock cursor movement while snapping
+        Vector3 startPosition = transform.position;
+        float elapsedTime = 0f;
+        float snapDuration = 0.2f; // Smooth snap over 0.2 seconds
+
+        while (elapsedTime < snapDuration)
+        {
+            transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / snapDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
+        isSnapping = false; // Unlock cursor movement after snapping
     }
 
     private void HoverKey(Collider2D collider)
     {
-        if (collider.TryGetComponent(out KeyboardKey keyboardKey)) {
+        if (collider.TryGetComponent(out KeyboardKey keyboardKey))
+        {
             keyboardKey.OnHoverEnter();
         }
-        else {
+        else
+        {
             Debug.LogWarning("Not a valid Key?");
         }
     }
 
     private void UnHoverPreviousKey()
     {
-        if (previousDetectedKey != null) {
-            if (previousDetectedKey.TryGetComponent(out KeyboardKey k)) {
+        if (previousDetectedKey != null)
+        {
+            if (previousDetectedKey.TryGetComponent(out KeyboardKey k))
+            {
                 k.OnHoverExit();
             }
         }
@@ -169,7 +210,8 @@ public class Cursor : MonoBehaviour
 
     private void DeSelectKey(GameObject key)
     {
-        if (key.TryGetComponent(out KeyboardKey k)) {
+        if (key.TryGetComponent(out KeyboardKey k))
+        {
             if (k.onSelect == false) return;
             k.OnDeSelect();
         }
@@ -178,14 +220,17 @@ public class Cursor : MonoBehaviour
     private void SelectKey(Collider2D collider)
     {
         if (collider == null) return;
-        if (collider.TryGetComponent(out KeyboardKey k)) {
+        if (collider.TryGetComponent(out KeyboardKey k))
+        {
             k.OnSelect();
         }
-        else {
+        else
+        {
             Debug.LogWarning("Not a valid Key?");
         }
     }
 }
+
 
 
 
@@ -258,3 +303,4 @@ public class Cursor : MonoBehaviour
     //     Gizmos.DrawWireSphere(transform.position, radius);
     // }
 // }
+
