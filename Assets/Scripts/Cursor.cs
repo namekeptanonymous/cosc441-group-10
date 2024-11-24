@@ -19,6 +19,7 @@ public class Cursor : MonoBehaviour
     private GameObject[] keys;
 
     private Vector3 previousMousePosition;
+    private float previousSpeed = 0f;
     [SerializeField] private float decelerationThreshold = 0.1f;
     [SerializeField] private float minDistanceToSnap = 0.7f;
     [SerializeField] private float snapCooldownTime = 0.5f;
@@ -49,12 +50,10 @@ public class Cursor : MonoBehaviour
         float distance = 9999f;
         GameObject closestKey = null;
 
-        if (cursorMode == CursorMode.Snap) {
-            Debug.Log("Cursor mode is " + cursorMode);
-        }
-
         if (cursorMode == CursorMode.DPad) {
-            Debug.Log("DPad mode is not implemented.");
+            // Makes cursor invisible
+            transform.localScale = new Vector2(0,0);
+            return;
         } 
         else {
             foreach (GameObject currentKey in keys) {
@@ -137,6 +136,26 @@ public class Cursor : MonoBehaviour
         bool isDecelerating = speed < decelerationThreshold;
         Debug.Log("Speed: " + speed + " | Is Decelerating: " + isDecelerating);
         return isDecelerating;
+
+        // NEW CODE BELOW, DOESN'T WORK!!!
+        // float currentSpeed = (Input.mousePosition - previousPosition).magnitude / Time.deltaTime;
+        // float speedChange = currentSpeed - previousSpeed;
+        // previousSpeed = currentSpeed;
+
+        // // If speed change (acceleration) is -ve and its magnitude is above the threshold, it's decelerating
+        // if (speedChange < 0 && Mathf.Abs(speedChange) > decelerationThreshold)
+        // {
+        //     Debug.Log($"Speed: {currentSpeed} | Speed Change: {speedChange} | Threshold: {decelerationThreshold} | Input Mouse Position: {Input.mousePosition} | Previous Mouse Position: {previousPosition}");
+        //     snapCooldownTimer = 0f;
+        //     isStopped = true;
+        //     isSnapping = true;
+        //     Debug.Log("Cursor is decelerating, starting cooldown.");
+        //     return true;
+        // }
+
+        // // If not decelerating, reset snapping state
+        // isSnapping = false;
+        // return false;
     }
 
     private void SnapToKey(GameObject key)
@@ -186,75 +205,3 @@ public class Cursor : MonoBehaviour
         }
     }
 }
-
-
-
-
-    // OLD CODE BELOW (for reference):
-
-    // private StudyBehavior studyBehavior;
-
-    // private void Awake()
-    // {
-    //     mainCam = Camera.main;
-    //     studyBehavior = FindObjectOfType<StudyBehavior>();
-    // }
-
-    // void Update()
-    // {
-    //     keys = GameObject.FindGameObjectsWithTag("Key");
-
-    //     //Get Mouse Position on screen, and get the corresponding position in a Vector3 World Co-Ordinate
-    //     Vector3 mousePosition = Input.mousePosition;
-
-    //     //Change the z position so that cursor does not get occluded by the camera
-    //     mousePosition.z += 9f;
-    //     mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
-    //     mousePosition.y = Mathf.Clamp(mousePosition.y, 0f, Screen.height);
-    //     transform.position = mainCam.ScreenToWorldPoint(mousePosition);
-
-    //     if (studyBehavior.StudySettings.cursorType == CursorType.PointCursor)
-    //     {
-    //         // Point Cursor behaviour
-    //         transform.localScale = new Vector2(0,0);
-    //         radius = 0f;
-    //     }
-
-    //     Collider2D detectedCollider = null;
-
-    //     Physics2D.OverlapCircle(transform.position, radius, contactFilter, results);
-
-    //     //Detect how many targets
-    //     //Change previous target back to default colour
-    //     if (results.Count < 1)
-    //     {
-    //         UnHoverPreviousKey();
-    //     }
-    //     else if (results.Count > 1)
-    //     {
-    //         UnHoverPreviousKey();
-    //         Debug.LogWarning("Too many targets in area");
-    //         return;
-    //     }
-    //     else
-    //     {
-    //         detectedCollider = results[0];
-    //         UnHoverPreviousKey(detectedCollider);
-    //         HoverKey(detectedCollider);
-    //     }
-
-    //     // On Mouse Click, select the closest target
-    //     if (Input.GetMouseButtonDown(0))
-    //     {
-    //         SelectTarget(detectedCollider);
-    //     }
-
-    //     previousDetectedKey = detectedCollider;
-    // }
-
-    // //Debug code
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.DrawWireSphere(transform.position, radius);
-    // }
-// }
