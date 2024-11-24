@@ -6,10 +6,12 @@ public class KeyboardKey : MonoBehaviour
 {
     private SpriteRenderer sprite;
     public bool onSelect;
+    private StudyBehavior studyBehavior;
     
     void Start()
     {
         sprite = GetComponentInChildren<SpriteRenderer>();
+        studyBehavior = studyBehavior;
     }
     void Update()
     {
@@ -36,8 +38,22 @@ public class KeyboardKey : MonoBehaviour
     {
         onSelect = true;
         Color currentColor = sprite.color;
-        sprite.color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.2f);
-        Debug.Log("Key "+gameObject.name+" was pressed.");
+        StudyBehavior studyBehavior = FindObjectOfType<StudyBehavior>();
+
+        if (gameObject.name != studyBehavior?.nextCorrectLetter)
+        {
+            sprite.color = new Color(1, 0, 0, 0.2f);
+            Debug.Log("Key "+gameObject.name+" was pressed, but it was not the correct key. The correct key is"+studyBehavior?.nextCorrectLetter+".");
+            studyBehavior?.HandleTypo();
+            return;
+        }
+        else
+        {
+            sprite.color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.2f);
+            Debug.Log("Key "+gameObject.name+" was pressed.");
+            studyBehavior?.RegisterKeyPress(gameObject.name);
+        }
+        
     }
 
     public void OnDeSelect()
