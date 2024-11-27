@@ -6,12 +6,10 @@ public class KeyboardKey : MonoBehaviour
 {
     private SpriteRenderer sprite;
     public bool onSelect;
-    private StudyBehavior studyBehavior;
     
     void Start()
     {
         sprite = GetComponentInChildren<SpriteRenderer>();
-        studyBehavior = studyBehavior;
     }
     void Update()
     {

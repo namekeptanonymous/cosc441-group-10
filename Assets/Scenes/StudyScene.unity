@@ -4060,12 +4060,10 @@ MonoBehaviour:
     wordsToType:
     - ABROAD
     - DOCUMENTARY
-    - VLOG
-    - WALKTHROUGH
     cursorModes: 00000000
     keyboardScales:
     - {x: 0.6772644, y: 0.6772644, z: 0.6772644}
-    - {x: 0.53, y: 0.53, z: 0.53}
+    - {x: 0.5, y: 0.5, z: 0.5}
     - {x: 0.9, y: 0.9, z: 0.9}
   repetitions: 2
   blockSequence: []

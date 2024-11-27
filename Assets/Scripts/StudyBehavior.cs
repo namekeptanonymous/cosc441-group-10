@@ -58,11 +58,6 @@ public class StudyBehavior : MonoBehaviour
         "KeyboardScale"
     };
 
-    void Awake()
-    {
-        CreateBlock(); // Generate the trial block sequence
-    }
-
     private void Start()
     {
         cursor = FindObjectOfType<Cursor>();
@@ -77,6 +72,7 @@ public class StudyBehavior : MonoBehaviour
             Debug.LogError("Keyboard not found in the scene!");
         }
 
+        CreateBlock();
         LogHeader();
         ApplyTrialConditions();
     }
@@ -133,16 +129,34 @@ public class StudyBehavior : MonoBehaviour
     {
         foreach (string word in studySettings.wordsToType)
         {
-            foreach (Vector3 scale in studySettings.keyboardScales)
+            Debug.Log("Bababooey");
+            if (cursor?.GetCursorMode() == Cursor.CursorMode.DPad)
             {
+                Debug.Log("DPad mode");
                 for (int i = 0; i < repetitions; i++)
                 {
                     blockSequence.Add(new TrialConditions()
                     {
                         cursorMode = studySettings.cursorModes[0],
                         word = word,
-                        keyboardScale = scale
+                        keyboardScale = studySettings.keyboardScales[0]
                     });
+                }
+            }
+            else
+            {
+                Debug.Log("Point/Snap mode");
+                foreach (Vector3 scale in studySettings.keyboardScales)
+                {
+                    for (int i = 0; i < repetitions; i++)
+                    {
+                        blockSequence.Add(new TrialConditions()
+                        {
+                            cursorMode = studySettings.cursorModes[0],
+                            word = word,
+                            keyboardScale = scale
+                        });
+                    }
                 }
             }
         }
