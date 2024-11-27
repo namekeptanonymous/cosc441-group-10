@@ -4063,10 +4063,12 @@ MonoBehaviour:
     - VLOG
     - WALKTHROUGH
     cursorModes: 00000000
+    keyboardScales:
+    - {x: 0.6772644, y: 0.6772644, z: 0.6772644}
+    - {x: 0.53, y: 0.53, z: 0.53}
+    - {x: 0.9, y: 0.9, z: 0.9}
   repetitions: 2
-  blockSequence:
-  - cursorMode: 0
-    word: RED
+  blockSequence: []
   typedWord: 
   nextCorrectLetter: 
 --- !u!4 &1247769912
@@ -5310,6 +5312,10 @@ PrefabInstance:
     - target: {fileID: 1917854168447070933, guid: bd625be6018ee4c66b2d75dd9be942c1, type: 3}
       propertyPath: m_Layer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1917854168447070933, guid: bd625be6018ee4c66b2d75dd9be942c1, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 3806621703145329965, guid: bd625be6018ee4c66b2d75dd9be942c1, type: 3}
       propertyPath: m_LocalScale.x

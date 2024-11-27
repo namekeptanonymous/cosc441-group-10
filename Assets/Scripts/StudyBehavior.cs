@@ -9,13 +9,17 @@ public class TrialConditions
 {
     public Cursor.CursorMode cursorMode; // Cursor mode for the trial
     public string word;                 // Word to be typed
+    public Vector3 keyboardScale;       // Default keyboard scale is 0.6772644.
 }
+
+
 
 [Serializable]
 public class StudySettings
 {
     public List<string> wordsToType;            // Words for the trials
     public List<Cursor.CursorMode> cursorModes; // Cursor modes to test
+    public List<Vector3> keyboardScales;        // Keyboard scales to test
 }
 
 public class StudyBehavior : MonoBehaviour
@@ -42,6 +46,7 @@ public class StudyBehavior : MonoBehaviour
     public string typedWord = ""; // Tracks the word being typed
     public string nextCorrectLetter = ""; // Tracks the next letter to be typed
     private Cursor cursor;
+    private GameObject keyboard; // Reference to the keyboard object
 
     private string[] header =
     {
@@ -49,7 +54,8 @@ public class StudyBehavior : MonoBehaviour
         "CursorMode",
         "Word",
         "CompletionTime",
-        "NumOfTypos"
+        "NumOfTypos",
+        "KeyboardScale"
     };
 
     void Awake()
@@ -63,6 +69,12 @@ public class StudyBehavior : MonoBehaviour
         if (cursor == null)
         {
             Debug.LogError("Cursor not found in the scene!");
+        }
+
+        keyboard = GameObject.Find("Keyboard");
+        if (keyboard == null)
+        {
+            Debug.LogError("Keyboard not found in the scene!");
         }
 
         LogHeader();
@@ -121,13 +133,17 @@ public class StudyBehavior : MonoBehaviour
     {
         foreach (string word in studySettings.wordsToType)
         {
-            for (int i = 0; i < repetitions; i++)
+            foreach (Vector3 scale in studySettings.keyboardScales)
             {
-                blockSequence.Add(new TrialConditions()
+                for (int i = 0; i < repetitions; i++)
                 {
-                    cursorMode = studySettings.cursorModes[0],
-                    word = word
-                });
+                    blockSequence.Add(new TrialConditions()
+                    {
+                        cursorMode = studySettings.cursorModes[0],
+                        word = word,
+                        keyboardScale = scale
+                    });
+                }
             }
         }
         blockSequence = YatesShuffle(blockSequence);
@@ -143,6 +159,8 @@ public class StudyBehavior : MonoBehaviour
 
         WordBeingTyped.text = "";
         WordToType.text = trial.word;
+
+        keyboard.transform.localScale = trial.keyboardScale;
 
         Debug.Log($"Trial {currentTrialIndex + 1}/{blockSequence.Count}: " +
                   $"Cursor Mode = {trial.cursorMode}, Word = {trial.word}");
@@ -161,7 +179,8 @@ public class StudyBehavior : MonoBehaviour
             CurrentTrial.cursorMode.ToString(),
             CurrentTrial.word,
             (timer * 1000).ToString(),
-            numOfTypos.ToString()
+            numOfTypos.ToString(),
+            CurrentTrial.keyboardScale.ToString()
         };
 
         CSVManager.AppendToCSV(data);
