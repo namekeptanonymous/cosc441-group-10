@@ -129,7 +129,6 @@ public class StudyBehavior : MonoBehaviour
     {
         foreach (string word in studySettings.wordsToType)
         {
-            Debug.Log("Bababooey");
             if (cursor?.GetCursorMode() == Cursor.CursorMode.DPad)
             {
                 Debug.Log("DPad mode");
@@ -137,7 +136,7 @@ public class StudyBehavior : MonoBehaviour
                 {
                     blockSequence.Add(new TrialConditions()
                     {
-                        cursorMode = studySettings.cursorModes[0],
+                        cursorMode = Cursor.CursorMode.DPad,
                         word = word,
                         keyboardScale = studySettings.keyboardScales[0]
                     });
@@ -152,7 +151,7 @@ public class StudyBehavior : MonoBehaviour
                     {
                         blockSequence.Add(new TrialConditions()
                         {
-                            cursorMode = studySettings.cursorModes[0],
+                            cursorMode = cursor?.GetCursorMode() == Cursor.CursorMode.Snap ? Cursor.CursorMode.Snap : Cursor.CursorMode.Point,
                             word = word,
                             keyboardScale = scale
                         });
@@ -194,7 +193,7 @@ public class StudyBehavior : MonoBehaviour
             CurrentTrial.word,
             (timer * 1000).ToString(),
             numOfTypos.ToString(),
-            CurrentTrial.keyboardScale.ToString()
+            CurrentTrial.keyboardScale.x.ToString()
         };
 
         CSVManager.AppendToCSV(data);
