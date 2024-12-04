@@ -52,7 +52,9 @@ public class Cursor : MonoBehaviour
 
         if (cursorMode == CursorMode.DPad)
         {
-            Debug.Log("DPad mode is not implemented.");
+            // DPad Cursor behaviour
+            transform.localScale = new Vector2(0, 0);
+            distance = 0f;
         }
         else
         {
@@ -118,6 +120,11 @@ public class Cursor : MonoBehaviour
     public void SetCursorMode(CursorMode mode)
     {
         cursorMode = mode;
+    }
+
+    public CursorMode GetCursorMode()
+    {
+        return cursorMode;
     }
 
     private bool IsDecelerating()
